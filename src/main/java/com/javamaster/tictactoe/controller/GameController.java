@@ -10,9 +10,8 @@ import com.javamaster.tictactoe.model.Player;
 import com.javamaster.tictactoe.service.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/game")
 public class GameController {
     private final GameService gameService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
 
     @PostMapping("/start")
@@ -43,12 +43,11 @@ public class GameController {
         return ResponseEntity.ok(gameService.connectToRandomGame(player));
     }
 
-    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay gamePlay) {
-        log.info("game play: {}", gamePlay);
-//        ResponseEntity.ok(gamePlay.)
-    return ResponseEntity.ok(gamePlay.);
+    @PostMapping("/gameplay")
+    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay request) throws InvalidGameException, GameNotFoundExeception {
+        log.info("game play: {}", request);
+        Game game = gameService.gamePlay(request);
+        simpMessagingTemplate.convertAndSend("/topic/game-progess" + game.getGameId(), game);
+        return ResponseEntity.ok(game);
     }
-
-
-
 }
