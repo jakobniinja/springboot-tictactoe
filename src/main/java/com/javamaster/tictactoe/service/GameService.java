@@ -1,5 +1,6 @@
 package com.javamaster.tictactoe.service;
 
+import com.javamaster.tictactoe.exception.FieldIsOccupiedException;
 import com.javamaster.tictactoe.exception.GameNotFoundExeception;
 import com.javamaster.tictactoe.exception.InvalidGameException;
 import com.javamaster.tictactoe.exception.InvalidParamException;
@@ -51,7 +52,7 @@ public class GameService {
     }
 
 
-    public Game gamePlay(GamePlay gamePlay) throws GameNotFoundExeception, InvalidGameException {
+    public Game gamePlay(GamePlay gamePlay) throws GameNotFoundExeception, InvalidGameException, FieldIsOccupiedException {
         if (!GameStorage.getInstance().getGames().containsKey(gamePlay.getGameId())) {
             throw new GameNotFoundExeception("Game not found!");
         }
@@ -61,7 +62,11 @@ public class GameService {
         }
 
         int[][] board = game.getBoard();
-        board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] = gamePlay.getType().getValue();
+        if (board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] == 0) {
+            board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] = gamePlay.getType().getValue();
+        }else{
+            throw new FieldIsOccupiedException("field row:" + gamePlay.getCoordinateY()+ " col:"+ gamePlay.getCoordinateX() + " is already in use");
+        }
 
         Boolean xWinner = checkWinner(game.getBoard(), TicToe.X);
         Boolean yWinner = checkWinner(game.getBoard(), TicToe.O);

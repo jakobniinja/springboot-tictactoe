@@ -1,6 +1,7 @@
 package com.javamaster.tictactoe.controller;
 
 import com.javamaster.tictactoe.controller.dto.ConnectRequest;
+import com.javamaster.tictactoe.exception.FieldIsOccupiedException;
 import com.javamaster.tictactoe.exception.GameNotFoundExeception;
 import com.javamaster.tictactoe.exception.InvalidGameException;
 import com.javamaster.tictactoe.exception.InvalidParamException;
@@ -44,7 +45,7 @@ public class GameController {
     }
 
     @PostMapping("/gameplay")
-    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay request) throws InvalidGameException, GameNotFoundExeception {
+    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay request) throws InvalidGameException, GameNotFoundExeception, FieldIsOccupiedException {
         log.info("game play: {}", request);
         Game game = gameService.gamePlay(request);
         simpMessagingTemplate.convertAndSend("/topic/game-progess" + game.getGameId(), game);
